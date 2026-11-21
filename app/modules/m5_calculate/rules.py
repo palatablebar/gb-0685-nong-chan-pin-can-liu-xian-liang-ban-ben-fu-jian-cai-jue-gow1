@@ -45,5 +45,7 @@ def apply(state):
         if r['id'] in bad:
             lines.add(r['_line']);state['quarantine'].append({'line':r['_line'],'id':r['id'],'code':bad[r['id']],'raw':r['_raw']})
     state['rows']=[r for r in state['rows'] if r['_line'] not in lines]
-    calculations=[{'id':r['id'],'line':r['_line'],'sample_id':r['sample_id'],'batch':r['batch'],'analyte':r['analyte'],'method':r['method'],'standard':r['standard_id'],'lower':r['lower'],'upper':r['upper'],'upper_exclusive':r['upper_exclusive'],'limit':r['limit'],'code':r['code'],'replaces':r['relation']} for r in chosen if r['id'] not in bad]
-    state['calculations']=calculations;state['business']={'total':len(calculations),'pass':sum(r['code']=='PASS' for r in calculations),'fail':sum(r['code']=='FAIL' for r in calculations),'uncertain':sum(r['code']=='UNCERTAIN' for r in calculations),'unit':'检测项目'};return state
+    # The adjudication keeps the reported value and expanded uncertainty with the
+    # verdict so sample conclusion, batch grade and archive share one result.
+    calculations=[{'id':r['id'],'line':r['_line'],'sample_id':r['sample_id'],'batch':r['batch'],'analyte':r['analyte'],'method':r['method'],'standard':r['standard_id'],'result':r['result'],'value':r.get('value'),'uncertainty':r.get('uncertainty'),'lower':r['lower'],'upper':r['upper'],'upper_exclusive':r['upper_exclusive'],'limit':r['limit'],'code':r['code'],'decision':'RELEASE' if r['code'] in ('PASS','FAIL') else 'HOLD','replaces':r['relation']} for r in chosen if r['id'] not in bad]
+    state['calculations']=calculations;state['business']={'total':len(calculations),'pass':sum(r['code']=='PASS' for r in calculations),'fail':sum(r['code']=='FAIL' for r in calculations),'uncertain':sum(r['code']=='UNCERTAIN' for r in calculations),'released':sum(r['decision']=='RELEASE' for r in calculations),'held':sum(r['decision']=='HOLD' for r in calculations),'unit':'检测项目'};return state

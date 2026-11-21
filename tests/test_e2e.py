@@ -30,3 +30,15 @@ def test_reselect_existing_run_updates_visible_batch(client):
 
 def test_invalid_csv_type_rejected(client):
     assert client.post('/api/runs',json={'csv':123}).status_code==422
+
+def test_workbench_shows_release_adjudication(client):
+    page=client.get('/m5_calculate').data.decode()
+    assert '准予发布' in page and '暂缓待补' in page and '/api/archive/' in page
+
+def test_workbench_export_matches_archive(client):
+    import csv,io,json
+    r=client.post('/api/runs',json={'sample':'dirty.csv'}).get_json()
+    e=client.get('/api/archive/'+r['run_id']+'/export.csv').data.decode('utf-8-sig')
+    rows=[row for row in csv.reader(io.StringIO(e)) if row and row[0]=='计算']
+    evidence={json.loads(row[5])['id']:json.loads(row[5]) for row in rows}
+    assert evidence['00002']['decision']=='HOLD' and evidence['00002']['uncertainty']=='0.002'

@@ -32,6 +32,7 @@
 | TRAP-15 | ug/kg与mg/kg | 差1000倍 | 浓度统一mg/kg | `app/modules/m4_segments/rules.py` | `tests/test_segments.py::test_unit_conversion` |
 | TRAP-25 | 标准时间边界 | 双版或错版 | 采样日半开区间选版 | `app/modules/m3_versions/standards.py` | `tests/test_versions.py::test_halfopen_effective` |
 | TRAP-20 | 复检引用环 | 遍历无法结束 | 引用路径检测 | `app/modules/m5_calculate/rules.py` | `tests/test_calculate.py::test_cycle_rejected` |
+| TRAP-27 | 贴限量点值 | 忽略不确定度出确定结论 | 护道区间判定与发布裁决 | `app/modules/m4_segments/rules.py` | `tests/test_calculate.py::test_borderline_project_held_not_released` |
 
 ## 对账规则
 
